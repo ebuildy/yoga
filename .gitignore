@@ -1,2 +1,4 @@
 Makefile
 devops
+static
+node_modules

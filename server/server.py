@@ -7,9 +7,13 @@ from flask import (
     Response,
     url_for
 )
-import subprocess, os, urllib
+import subprocess, os, urllib, requests
+
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 def run_yarn_logs(app_id="", container_id="", show_info=False):
 
@@ -25,7 +29,13 @@ def run_yarn_logs(app_id="", container_id="", show_info=False):
     else:
         return Response(result.stderr, status=500, mimetype="text/plain")
 
-@app.route("/")
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def home(path=""):
+    return app.send_static_file('index.html')
+
+@app.route("/api/about")
+@app.route("/api/help")
 def hello():
     def has_no_empty_params(rule):
         defaults = rule.defaults if rule.defaults is not None else ()
@@ -43,27 +53,37 @@ def hello():
 
         links[rule.endpoint] = line
 
-    return jsonify(links)
+    return jsonify({
+        "name" : "yoga",
+        "description" : "YARN logs as a (HTTP) service",
+        "author" : "Thomas Decaux <t.decaux@qwant.com>",
+        "version" : "0.0.1",
+        "routes" : links
+    })
 
 @app.route("/favicon.ico")
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'web'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return app.send_static_file('favicon.ico')
 
 @app.route("/robots.txt")
 def robots():
-    return send_from_directory(os.path.join(app.root_path, 'web'),
-                               'robots.txt', mimetype='application/text')
+    return app.send_static_file('robots.txt')
 
-@app.route("/<yarn_app>")
+@app.route("/api/logs")
+def get_apps():
+    r = requests.get(os.getenv("YOGA_YARN_API_URL"), headers={"Accept" : "application/json"}, verify=False)
+
+    return Response(r.text, status=200, mimetype="application/json")
+
+@app.route("/api/logs/<yarn_app>")
 def get_by_app(yarn_app):
     return run_yarn_logs(app_id=yarn_app)
 
-@app.route("/<yarn_app>/info")
+@app.route("/api/logs/<yarn_app>/info")
 def get_by_app_info(yarn_app):
     return run_yarn_logs(app_id=yarn_app, show_info=True)
 
-@app.route("/<yarn_app>/<yarn_container>")
+@app.route("/api/logs/<yarn_app>/<yarn_container>")
 def get_by_container(yarn_app, yarn_container):
     return run_yarn_logs(app_id=yarn_app, container_id=yarn_container)
 

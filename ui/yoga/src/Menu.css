@@ -1,0 +1,28 @@
+.menu_list
+{
+  margin: 0;
+  padding: 2px;
+}
+
+.menu_list_item
+{
+  list-style: none;
+  text-align: left;
+  border-bottom: 1px solid #3e5c79;
+}
+
+.menu_list_item > a
+{
+  display: block;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+.menu_list_item > a > h3
+{
+  font-weight: normal;
+  font-size: 1.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
