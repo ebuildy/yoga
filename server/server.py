@@ -7,7 +7,7 @@ from flask import (
     Response,
     url_for
 )
-import subprocess, os, urllib, requests
+import subprocess, os, urllib, requests, time
 
 from flask_cors import CORS
 
@@ -71,7 +71,7 @@ def robots():
 
 @app.route("/api/logs")
 def get_apps():
-    r = requests.get(os.getenv("YOGA_YARN_API_URL"), headers={"Accept" : "application/json"}, verify=False)
+    r = requests.get("%s?limit=100&startedTimeBegin=%i" % (os.getenv("YOGA_YARN_API_URL"), 1000*(int(time.time()) - 24*60*60)), headers={"Accept" : "application/json"}, verify=False)
 
     return Response(r.text, status=200, mimetype="application/json")
 
