@@ -2,3 +2,5 @@ Makefile
 devops
 static
 node_modules
+yoga.pid
+logs

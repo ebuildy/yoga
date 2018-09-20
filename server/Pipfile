@@ -7,6 +7,10 @@ name = "pypi"
 flask = "*"
 requests = "*"
 flask-cors = "*"
+python-daemon = "*"
+lockfile = "*"
+argparse = "*"
+psutil = "*"
 
 [dev-packages]
 

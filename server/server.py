@@ -7,7 +7,9 @@ from flask import (
     Response,
     url_for
 )
-import subprocess, os, urllib, requests, time
+import subprocess, os, urllib, requests, time, daemon, argparse, psutil
+
+from daemon import pidfile
 
 from flask_cors import CORS
 
@@ -88,5 +90,46 @@ def get_by_container(yarn_app, yarn_container):
     return run_yarn_logs(app_id=yarn_app, container_id=yarn_container)
 
 if __name__ == '__main__':
-    app.debug = False
-    app.run(host = '0.0.0.0',port=5005)
+
+    parser = argparse.ArgumentParser(description="YOGA")
+    parser.add_argument('--pid', default='/var/run/yoga.pid')
+    parser.add_argument('--log', default='/var/log/yoga/')
+    parser.add_argument('--port', default=5005)
+    parser.add_argument('--host', default='0.0.0.0')
+    parser.add_argument('--debug', default=False)
+    parser.add_argument('action', default="start")
+
+    args = parser.parse_args()
+
+    if args.action == "start":
+        with daemon.DaemonContext(
+                working_directory = ".",
+                stdout = open(os.path.join(args.log, "out.log"), "w"),
+                stderr = open(os.path.join(args.log, "err.log"), "w"),
+                pidfile = pidfile.TimeoutPIDLockFile(args.pid)
+            ):
+            app.debug = args.debug
+            app.run(host = args.host,port=args.port)
+
+    elif args.action == "status":
+        if os.path.isfile(args.pid):
+            with open(args.pid, "r") as f:
+                pid = int(f.read())
+                p = psutil.Process(pid)
+                status = "running (pid: %i, name: %s, cmd: %s)" % (pid, p.name(), p.cmdline())
+        else:
+            status = "not running (reason: PID file not found!)"
+        print("status: %s" % (status))
+    elif args.action == "stop":
+        if os.path.isfile(args.pid):
+            print("exiting...")
+            with open(args.pid, "r") as f:
+                pid = int(f.read())
+                p = psutil.Process(pid)
+                p.kill()
+                os.remove(args.pid)
+                print("killed process %i and remove PID file (%s)!" % (pid, args.pid))
+        else:
+            print("<!> not running (reason: PID file not found!) <!>")
+    else:
+        print("ation must be: start / status / stop")
