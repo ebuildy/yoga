@@ -1,7 +1,6 @@
 html, body, #root, .App {
   height: 100%;
-  font-family: "Helvetica Neue",Roboto,Arial,"Droid Sans",sans-serif;
-  font-size: 13px;
+  background: #F2F2F2;
 }
 
 body, .App {
@@ -9,11 +8,6 @@ body, .App {
     overflow: hidden;  /*makes the body non-scrollable (we will add scrolling to the sidebar and main content containers)*/
     margin: 0px;  /*removes default style*/
     box-sizing: border-box;
-}
-
-.App {
-  display: flex;
-  flex-direction: row;
 }
 
 .App-logo {
@@ -41,6 +35,12 @@ body, .App {
   to { transform: rotate(360deg); }
 }
 
+.layout-viewer {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
 .layout-menu {
   width: 250px;
   background: #2A3F54;
@@ -52,6 +52,4 @@ body, .App {
 
 .layout-content {
   flex: 1;
-  background: #111;
-  color: white;
 }

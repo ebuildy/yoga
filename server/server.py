@@ -57,7 +57,7 @@ def hello():
 
     return jsonify({
         "name" : "yoga",
-        "description" : "YARN logs as a (HTTP) service",
+        "description" : "YARN logs viewer",
         "author" : "Thomas Decaux <t.decaux@qwant.com>",
         "version" : "0.0.1",
         "routes" : links
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', default=5005)
     parser.add_argument('--host', default='0.0.0.0')
     parser.add_argument('--debug', default=False)
-    parser.add_argument('action', default="start")
+    parser.add_argument('action', default="foreground")
 
     args = parser.parse_args()
 
@@ -131,5 +131,8 @@ if __name__ == '__main__':
                 print("killed process %i and remove PID file (%s)!" % (pid, args.pid))
         else:
             print("<!> not running (reason: PID file not found!) <!>")
+    elif args.action == "foreground":
+        app.debug = args.debug
+        app.run(host = args.host,port=args.port)
     else:
         print("ation must be: start / status / stop")
