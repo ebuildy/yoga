@@ -5,9 +5,6 @@ html, body, #root, .App {
 
 body, .App {
     height: 100%;
-    overflow: hidden;  /*makes the body non-scrollable (we will add scrolling to the sidebar and main content containers)*/
-    margin: 0px;  /*removes default style*/
-    box-sizing: border-box;
 }
 
 .App-logo {
@@ -43,11 +40,6 @@ body, .App {
 
 .layout-menu {
   width: 250px;
-  background: #2A3F54;
-}
-
-.layout-menu a {
-  color: #E7E7E7;
 }
 
 .layout-content {

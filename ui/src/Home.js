@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import Loader from 'react-loader-spinner'
+import moment from 'moment'
+import ReactTable from "react-table"
+import 'react-table/react-table.css'
 
 class Home extends Component {
 
@@ -11,6 +14,10 @@ class Home extends Component {
       isLoaded: false,
       items: []
     };
+  }
+
+  getStatusLabelClass(item) {
+    return item.finalStatus === 'SUCCEEDED' ? 'success' : 'info'
   }
 
   componentDidMount() {
@@ -47,37 +54,57 @@ class Home extends Component {
        width="100"
     />;
    } else {
+
      return <div className="container">
       <h2 className="my-3">YOGA: YARN logs viewer</h2>
      <div className="card">
         <div className="card-body">
          <h5 className="card-title">Logs</h5>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Kind</th>
-                <th>Title</th>
-                <th>ID</th>
-                <th></th>
-              </tr>
-              </thead>
-              <tbody>
-              {items.map(item => (
-                <tr className="menu_list_item" key={item.id}>
-                  <td>YARN / {item.applicationType}</td>
-                  <td>
-                    <Link to={`/logs/${item.id}`}>{item.name}</Link>
-                  </td>
-                  <td>
-                    <Link to={`/logs/${item.id}`}>{item.id}</Link>
-                  </td>
-                  <td>
-                  <label className="badge ">{item.state}</label> <label className="badge ">{item.finalStatus}</label>
-                  </td>
-                </tr>
-              ))}
-              </tbody>
-          </table>
+         <ReactTable
+            data={items}
+            columns={[
+              {
+                Header: 'Kind',
+                accessor: 'applicationType'
+              },
+              {
+                Header: 'Title',
+                accessor: 'name',
+                Cell: row => (
+                  <div>
+                    <Link to={`/logs/${row.original.id}`}>{row.original.name} <br /><small>{row.original.id}</small></Link>
+                  </div>
+                )
+              },
+              {
+                Header: 'Time',
+                accessor: 'startedTime',
+                Cell: row => (
+                  <div>
+                  <small>Started {moment(row.original.startedTime).fromNow()}
+                  <br />
+                  (took {moment.duration(row.original.elapsedTime).humanize()})</small>
+                  </div>
+                )
+              },
+              {
+                Header: 'Status',
+                Cell: row => (
+                  <div>
+                  <label className="badge ">{row.original.state}</label> {row.original.finalStatus !== "UNDEFINED" && (<label className={`badge badge-${this.getStatusLabelClass(row.original)}`}>{row.original.finalStatus}</label>) }
+                  </div>
+                )
+              }
+            ]}
+            defaultSorted={[
+            {
+              id: "startedTime",
+              desc: true
+            }
+          ]}
+          defaultPageSize={20}
+          className="-striped -highlight"
+          />
           </div>
       </div>
       <br />

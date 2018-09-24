@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Scrollbars } from 'react-custom-scrollbars';
 import ReactTooltip from 'react-tooltip'
 import Loader from 'react-loader-spinner'
+import ReactTable from "react-table"
+import 'react-table/react-table.css'
 
 import './Menu.css';
 
@@ -53,18 +55,28 @@ class Menu extends Component {
      } else {
        return (
          <Scrollbars>
-           <ul className="menu_list">
-             {items.map(item => (
-               <li className="menu_list_item" key={item.id}>
-                  <Link to={`/logs/${item.id}`} data-tip={`<ul><li>${item.name}</li><li>ID: ${item.id}</li></ul>`} data-place="right" data-effect="solid" data-html={true}>
-                   <h3>{item.name}: {item.id}</h3>
-                   <p>
-                    <label>State: {item.state} - {item.finalStatus}</label>
-                   </p>
-                 </Link>
-               </li>
-             ))}
-           </ul>
+           <ReactTable
+              data={items}
+              columns={[
+                {
+                  Header: 'Title',
+                  accessor: 'name',
+                  Cell: row => (
+                    <div>
+                      <Link to={`/logs/${row.original.id}`} data-tip={`<ul><li>${row.original.name}</li><li>ID: ${row.original.id}</li></ul>`} data-place="right" data-effect="solid" data-html={true}>{row.original.name} <br /><small>{row.original.id}</small></Link>
+                    </div>
+                  )
+                }
+              ]}
+              defaultSorted={[
+              {
+                id: "startedTime",
+                desc: true
+              }
+            ]}
+            defaultPageSize={20}
+            className="-striped -highlight"
+            />
            <ReactTooltip />
          </Scrollbars>
        );
