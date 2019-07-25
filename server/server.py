@@ -19,7 +19,7 @@ CORS(app)
 
 def run_yarn_logs(app_id="", container_id="", show_info=False):
 
-    cmd = ['yarn', 'logs', '-applicationId', app_id]
+    cmd = ['yarn', 'logs', '-log_files', 'stdout,stderr', '-size', '-50000', '-applicationId', app_id]
 
     if show_info:
         cmd.append("-show_container_log_info")
